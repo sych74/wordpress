@@ -48,8 +48,9 @@ onInstall:
         PROTOCOL: https
         
   - script: ${baseUrl}/scripts/idna.js
+    domains: ${env.domain}
   - setGlobals:
-      DOMAIN: ${response.domain}         
+      DOMAIN: ${response.domains} 
     
   - log: Set Node Display Name
   - setNodeDisplayName [cp]: AppServer
