@@ -159,9 +159,10 @@ onInstall:
       setGlobals:
         PROTOCOL: https
         
-  - script: ${baseUrl}/scripts/idna.js
+  - script: /scripts/idna.js
+    domains: ${env.domain}
   - setGlobals:
-      DOMAIN: ${response.domain}         
+      DOMAIN: ${response.domains}
     
   - creatUserDB
 
