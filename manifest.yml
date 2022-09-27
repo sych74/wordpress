@@ -130,7 +130,9 @@ onInstall:
       - installCDN
       - setupCDN
     - if (${settings.woocommerce:false}): installWoocommerce
-    - install: /scripts/events.jps
+    - install:
+      - /scripts/events.jps
+      - https://raw.githubusercontent.com/jelastic-jps/backup-addon/main/backup.jps
     - if ('${settings.success_email}' != 'false'):
       - return:
           type: success
