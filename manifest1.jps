@@ -13,8 +13,6 @@ description:
 
 baseUrl: https://raw.githubusercontent.com/sych74/wordpress/WP-249
 
-onBeforeInit: /scripts/beforeInit.js?_r=${fn.random}
-
 settings:
   fields:
     - caption: PHP version
