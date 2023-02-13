@@ -1,0 +1,129 @@
+jpsType: install
+jpsVersion: '1.7.2'
+id: wordpress
+name: WordPress Standalone Kit
+categories:
+  - apps/blogs
+  - apps/content-management
+logo: https://raw.githubusercontent.com/jelastic-jps/wordpress/master/images/wp-standalone.png
+homepage: http://wordpress.org/
+description:
+  text: WordPress Standalone with built-in kit for choosing optimal application servers and a set of advanced features for running websites and blogs. WordPress CMS deployed as a lightweight standalone container with minimal allocated resources for cost efficiency.
+  short: WordPress Standalone with built-in kit for choosing optimal application servers and a set of advanced features for running websites and blogs
+
+baseUrl: https://raw.githubusercontent.com/sych74/wordpress/WP-249
+
+onBeforeInit: /scripts/beforeInit.js?_r=${fn.random}
+nodes: definedInOnBeforeInstall
+
+skipNodeEmails: true
+
+settings:
+  fields:
+    - caption: PHP version
+      type: list
+      name: php_engine
+      default: php8.2
+      required: true
+      width: 225
+      values:
+        - value: php8.2
+          caption: PHP 8.2
+        - value: php8.1
+          caption: PHP 8.1
+        - value: php8.0
+          caption: PHP 8.0
+        - value: php7.4
+          caption: PHP 7.4
+  
+    - caption: Advanced Features
+      type: displayfield
+      name: displayfield
+      markup:
+ 
+    - caption: Install LiteSpeed High-Performance Web Server
+      type: checkbox
+      name: ls-addon
+      value: true
+      disabled: false
+      tooltip: "If this option is disabled, the cluster will be installed using NGINX load balancer and application servers"
+      showIf:
+        true:
+          - caption: WordPress Brute Force Attack Protection
+            type: checkbox
+            name: wp_protect
+            value: true
+            disabled: false
+            tooltip: "Secure WordPress Admin Panel with <a href='https://www.litespeedtech.com/support/wiki/doku.php/litespeed_wiki:config:wordpress-protection' target='_blank'>LiteSpeed Brute Force Protection</a> that limits failed login attempts. Default action is <b>Throttle</b> and number of allowed attempts is <b>100</b>"
+
+          - caption: Web Application Firewall
+            type: checkbox
+            name: waf
+            value: true
+            disabled: false
+            tooltip: "Protect web sites with <a href='https://www.litespeedtech.com/support/wiki/doku.php/litespeed_wiki:waf' target='_blank'>LiteSpeed built-in WAF</a> based on Free ModSecurity Rules from Comodo"
+
+        false:
+          - caption: WordPress Brute Force Attack Protection
+            type: checkbox
+            name: wp_protect
+            value: false
+            disabled: true
+            tooltip: "Secure WordPress Admin Panel with <a href='https://www.litespeedtech.com/support/wiki/doku.php/litespeed_wiki:config:wordpress-protection' target='_blank'>LiteSpeed Brute Force Protection</a> that limits failed login attempts. Default action is <b>Throttle</b> and number of allowed attempts is <b>100</b>"
+        
+          - caption: Web Application Firewall
+            type: checkbox
+            name: waf
+            value: false
+            disabled: true
+            tooltip: "Protect web sites with <a href='https://www.litespeedtech.com/support/wiki/doku.php/litespeed_wiki:waf' target='_blank'>LiteSpeed built-in WAF</a> based on Free ModSecurity Rules from Comodo"
+             
+    - caption: Install Let's Encrypt SSL with Auto-Renewal
+      type: checkbox
+      name: le-addon
+      value: true
+      disabled: false
+      tooltip: "Advanced integration with Let's Encrypt certificate authority that simplifies and automates the process of issuing, configuring and updating trusted custom SSL certificates."
+
+    - caption: Install Lightning-Fast Premium CDN
+      type: checkbox
+      name: cdn-addon
+      value: true
+      disabled: false
+      tooltip: "Jelastic CDN is an HTTP/3 premium content delivery network of 160+ Super PoPs (points of presence) with bandwidth capacity up to 115 Tbps, advanced caching and acceleration strategies based on best-in-class IP Anycast technology."
+
+    - caption: Install WordPress Multisite Network
+      type: checkbox
+      name: mu-addon
+      value: false
+      disabled: false
+      tooltip: "Multisite is a type of WordPress installation that allows you to create and manage a network of multiple websites from a single WordPress dashboard. This lets you easily make changes and keep all of your websites updated from one place."
+
+    - caption: Install WooCommerce
+      type: checkbox
+      name: woocommerce
+      value: false
+      disabled: false
+      tooltip: "WooCommerce is a free open-source e-commerce plugin designed specifically for WordPress. This is a great platform for a store of any size."
+
+    - type: displayfield
+      hideLabel: true
+      hidden: true
+      name: bl_count   
+      markup:
+
+mixins:
+ - https://raw.githubusercontent.com/jelastic-jps/wordpress/master/configs/vers.yaml
+
+globals:
+  isSingleDeploy: ${settings.isSingleDeploy:true}
+  WP_CLUSTER_PATH: https://raw.githubusercontent.com/jelastic-jps/wordpress-cluster/v2.2.0
+  DB_USER: ${settings.DB_USER:user-[fn.random]}
+  DB_PASS: ${settings.DB_PASS:[fn.password(10)]}
+  DB_HOST: 127.0.0.1
+  PROTOCOL: http
+  WP_ADMIN_PASS: ${settings.WP_ADMIN_PASS:[fn.password(10)]}
+  SUCCESS: default
+
+onInstall:
+  log: -----  ${settings.cdn-addon}
