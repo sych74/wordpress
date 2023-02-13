@@ -119,4 +119,4 @@ globals:
   SUCCESS: default
 
 onInstall:
-  log: -----  ${settings.cdn-addon}
+  log: -----  ${settings.cdn-addon:false}
