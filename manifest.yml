@@ -119,6 +119,8 @@ mixins:
 globals:
   isSingleDeploy: ${settings.isSingleDeploy:true}
   WP_CLUSTER_PATH: https://raw.githubusercontent.com/sych74/wordpress-cluster/extDB
+  DB_ADMIN_USER: ${settings.DB_ADMIN_USER}
+  DB_ADMIN_PASS: ${settings.DB_ADMIN_PASS}
   DB_USER: ${settings.DB_USER:user-[fn.random]}
   DB_PASS: ${settings.DB_PASS:[fn.password(10)]}
   DB_NAME: ${settings.DB_NAME:wp-[fn.random]}
@@ -263,12 +265,11 @@ actions:
   createUserDB:
     - log: Create user for DataBase
     - cmd [cp]: |-
-        wget ${baseUrl}/configs/sqldb/wordpress.cnf -O /etc/mysql/conf.d/wordpress.cnf &>> /var/log/run.log;
-        wget https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/master/scripts/setupUser.sh -O ~/setupUser.sh &>> /var/log/run.log;
-        bash ~/setupUser.sh ${globals.DB_USER} ${globals.DB_PASS} &>> /var/log/run.log;
-        jem passwd set -p ${globals.DB_PASS} &>> /var/log/run.log;
-      user: root
-      
+        mysql -u${globals.db_admin_user} -p${globals.db_admin_pass} -h${globals.db_host} -P${globals.db_port} -e "CREATE DATABASE ${globals.db_name};"
+        mysql -u${globals.db_admin_user} -p${globals.db_admin_pass} -h${globals.db_host} -P${globals.db_port} -e "CREATE USER '${globals.db_user}'@'%' IDENTIFIED BY '${globals.db_pass}';"
+        mysql -u${globals.db_admin_user} -p${globals.db_admin_pass} -h${globals.db_host} -P${globals.db_port} -e "GRANT ALL PRIVILEGES ON ${globals.db_name}.* TO '${globals.db_user}'@'%' WITH GRANT OPTION;"
+        mysql -u${globals.db_admin_user} -p${globals.db_admin_pass} -h${globals.db_host} -P${globals.db_port} -e "FLUSH PRIVILEGES;"      
+  
   installWoocommerce:
     cmd[${nodes.cp.master.id}]: |-
       wp plugin install woocommerce --version=${globals.version_woocommerce} --activate --path=/var/www/webroot/ROOT &>> /var/log/run.log;
