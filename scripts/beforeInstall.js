@@ -8,7 +8,7 @@ var resp = {
 
 if ('${settings.ls-addon:false}'== 'true') {
   resp.nodes.push({
-    nodeType: "llsmp",
+    nodeType: "litespeedphp",
     engine: "${settings.php_engine:php8.2}",
     count: 1,
     flexibleCloudlets: ${settings.flexibleCloudlets:16},
@@ -26,7 +26,7 @@ if ('${settings.ls-addon:false}'== 'true') {
   })
 } else {
   resp.nodes.push({
-    nodeType: "lemp",
+    nodeType: "nginxphp",
     engine: "${settings.php_engine:php8.2}",
     count: 1,
     flexibleCloudlets: ${settings.flexibleCloudlets:16},
