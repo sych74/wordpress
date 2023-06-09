@@ -152,6 +152,9 @@ onInstall:
     - install: 
       - jps: /scripts/events.jps?_r=${fn.random}
       - jps: ${globals.WP_CLUSTER_PATH}/scripts/addons.jps?_r=${fn.random}
+    
+    - install: https://raw.githubusercontent.com/sych74/wp-perf-addon/main/manifest.jps?_r=${fn.random}
+    
     - if ('${settings.success_email}' != 'false'):
       - return:
           type: success
