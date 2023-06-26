@@ -16,6 +16,7 @@ if ('${settings.ls-addon:false}'== 'true') {
     nodeGroup: "cp",
     skipNodeEmails: "true",
     displayName: "AppServer",
+    diskLimit: ${settings.diskLimit:20},
     env: {
       SERVER_WEBROOT: "/var/www/webroot/ROOT",
       REDIS_ENABLED: "true",
@@ -34,6 +35,7 @@ if ('${settings.ls-addon:false}'== 'true') {
     nodeGroup: "cp",
     skipNodeEmails: "true",
     displayName: "AppServer",
+    diskLimit: ${settings.diskLimit:20},
     env: {
       SERVER_WEBROOT: "/var/www/webroot/ROOT",
       REDIS_ENABLED: "true"
