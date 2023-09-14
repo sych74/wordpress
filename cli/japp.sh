@@ -90,7 +90,7 @@ getEngineUpdates(){
     }
 
     local result=$(execReturnAction "_getEngineUpdates" 'Checks for WordPress updates')
-    [ x${stdout} == x"" ] && { execArgJSONResponse "${SUCCESS_CODE}" "versionsToUpdate" "[]"; } || { execArgJSONResponse "${SUCCESS_CODE}" "versionsToUpdate"  "${result}"; }
+    [ x${result} == x"" ] && { execArgJSONResponse "${SUCCESS_CODE}" "versionsToUpdate" "[]"; } || { execArgJSONResponse "${SUCCESS_CODE}" "versionsToUpdate"  "${result}"; }
 }
 
 updateEngine(){
