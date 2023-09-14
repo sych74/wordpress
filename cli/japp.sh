@@ -41,12 +41,23 @@ execUpdateResponse(){
     echo ${output}
 }
 
-
 execAction(){
     local action="$1"
     local message="$2"
 
     stdout=$( { ${action}; } 2>&1 ) && { log "${message}...done";  } || {
+        error="${message} failed, please check ${RUN_LOG} for details"
+        execArgResponse "${FAIL_CODE}" "errOut" "${stdout}"
+        log "${message}...failed\n==============ERROR==================\n${stdout}\n============END ERROR================";
+        exit 0
+    }
+}
+
+execReturnAction(){
+    local action="$1"
+    local message="$2"
+
+    stdout=$( { ${action}; } 2>&1 ) && { echo ${stdout}; log "${message}...done";  } || {
         error="${message} failed, please check ${RUN_LOG} for details"
         execArgResponse "${FAIL_CODE}" "errOut" "${stdout}"
         log "${message}...failed\n==============ERROR==================\n${stdout}\n============END ERROR================";
@@ -63,13 +74,13 @@ installWP_CLI(){
 }
 
 getEngineVersion(){
-
+    
     _getEngineVersion(){
         wpCommandExec 'core version'
     }
 
-    execAction "_getEngineVersion" 'Get WordPress version'
-    execArgResponse "${SUCCESS_CODE}" "version" "${stdout}"
+    local result=$(execReturnAction "_getEngineVersion" 'Get WordPress version')
+    execArgResponse "${SUCCESS_CODE}" "version" "${result}"
 }
 
 getEngineUpdates(){
@@ -78,8 +89,8 @@ getEngineUpdates(){
         wpCommandExec 'core check-update --fields=version,update_type --format=json'
     }
     
-    execAction "_getEngineUpdates" 'Checks for WordPress updates'
-	[ x${stdout} == x"" ] && { execArgJSONResponse "${SUCCESS_CODE}" "versionsToUpdate" "[]"; } || { execArgJSONResponse "${SUCCESS_CODE}" "versionsToUpdate"  "${stdout}"; }
+    local result=$(execReturnAction "_getEngineUpdates" 'Checks for WordPress updates')
+    [ x${stdout} == x"" ] && { execArgJSONResponse "${SUCCESS_CODE}" "versionsToUpdate" "[]"; } || { execArgJSONResponse "${SUCCESS_CODE}" "versionsToUpdate"  "${result}"; }
 }
 
 updateEngine(){
@@ -93,11 +104,9 @@ updateEngine(){
         [[ ! -z ${engine_version} ]] && { wpCommandExec "core update --version=${engine_version}"; } || { wpCommandExec "core update"; }
     }
     
-    execAction "_getEngineVersion" 'Get  WordPress version'
-    oldVersion=${stdout}
+    local oldVersion=$(execReturnAction "_getEngineVersion" 'Get  WordPress version')
     execAction "_updateEngine" "Update WordPress Core"
-    execAction "_getEngineVersion" 'Get  WordPress version'
-    newVersion=${stdout}
+    local newVersion=$(execReturnAction "_getEngineVersion" 'Get  WordPress version')
     execUpdateResponse "${SUCCESS_CODE}" "${oldVersion}" "${newVersion}"
 }
 
@@ -107,8 +116,8 @@ getPlugins(){
         wpCommandExec 'plugin list --format=json'
     }
     
-    execAction "_getPlugins" 'Get plugins list'
-    execArgJSONResponse "${SUCCESS_CODE}" "plugins" "${stdout}"
+    local result=$(execReturnAction "_getPlugins" 'Get plugins list')
+    execArgJSONResponse "${SUCCESS_CODE}" "plugins" "${result}"
 }
 
 getPluginInfo(){
@@ -118,8 +127,8 @@ getPluginInfo(){
         wpCommandExec "plugin get ${plugin_name} --format=json"
     }
     
-    execAction "_getPluginInfo" "Get plugin ${plugin_name} info"
-    execArgJSONResponse "${SUCCESS_CODE}" "pluginInfo" "${stdout}"
+    local result=$(execReturnAction "_getPluginInfo" "Get plugin ${plugin_name} info")
+    execArgJSONResponse "${SUCCESS_CODE}" "pluginInfo" "${result}"
 }
 
 updatePlugin(){
@@ -133,11 +142,9 @@ updatePlugin(){
         [[ ! -z ${plugin_version} ]] && { wpCommandExec "plugin update ${plugin_name} --version ${plugin_version}"; } || { wpCommandExec "plugin update ${plugin_name}"; }
     }
     
-    execAction "_getPluginVersion" "Get plugin ${plugin_name} version"
-    oldVersion=${stdout}
+    local oldVersion=$(execReturnAction "_getPluginVersion" "Get plugin ${plugin_name} version")
     execAction "_updatePlugin" "Update plugin ${plugin_name}"
-    execAction "_getPluginVersion" "Get plugin ${plugin_name} version"
-    newVersion=${stdout}
+    local newVersion=$(execReturnAction "_getPluginVersion" "Get plugin ${plugin_name} version")
     execUpdateResponse "${SUCCESS_CODE}" "${oldVersion}" "${newVersion}"
 }
 
@@ -153,8 +160,8 @@ activatePlugin(){
     }
     
     execAction "_activatePlugin" "Activating ${plugin_name}"
-    execAction "_getStatusPlugin" "Get ${plugin_name} status"
-    execArgResponse "${SUCCESS_CODE}" "pluginStatus" "${stdout}"
+    local result=$(execReturnAction "_getStatusPlugin" "Get ${plugin_name} status")
+    execArgResponse "${SUCCESS_CODE}" "pluginStatus" "${result}"
 }
 
 deactivatePlugin(){
@@ -169,12 +176,12 @@ deactivatePlugin(){
     }
     
     execAction "_deactivatePlugin" "Deactivating ${plugin_name}"
-    execAction "_getStatusPlugin" "Get ${plugin_name} status"
-    execArgResponse "${SUCCESS_CODE}" "pluginStatus" "${stdout}"
+    local result=$(execReturnAction "_getStatusPlugin" "Get ${plugin_name} status")
+    execArgResponse "${SUCCESS_CODE}" "pluginStatus" "${result}"
 }
 
 deletePlugin(){
-      local plugin_name=$2
+    local plugin_name=$2
 
     _deletePlugin(){
         wpCommandExec "plugin delete ${plugin_name}"
