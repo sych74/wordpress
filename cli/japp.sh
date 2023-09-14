@@ -17,18 +17,29 @@ log(){
     echo -e "[${timestamp}]: ${message}" >> ${RUN_LOG}
 }
 
+versionHandler(){
+    local output=$(echo "$1" | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | tail -n1)
+    echo $output
+}
+
+jsonHandler(){
+    local output
+    [ x"$1" == "x[]" ] && { output="$1"; } || { output=$(echo "$1" | grep -oE '\[{.*\}]'); }
+    echo $output
+}
+
 execArgResponse(){
     local result=$1
     local key_name=$2
-    local response=$(echo $3 | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | tail -n1)
+    local response=$3
     output=$(jq -cn --raw-output --argjson result "$result" --arg key $key_name --arg response "${response}" '{result: $result, ($key): $response}')
-    echo ${output}
+    echo $output
 }
 
 execArgJSONResponse(){
     local result=$1
     local key_name=$2
-    local response=$(echo $3 | grep -oE '\[{.*\}]')
+    local response=$3
     output=$(jq -cn --raw-output --argjson result "$result" --arg key $key_name --argjson response "${response}" '{result: $result, ($key): $response}')
     echo ${output}
 }
@@ -80,6 +91,7 @@ getEngineVersion(){
     }
 
     local result=$(execReturnAction "_getEngineVersion" 'Get WordPress version')
+    result=$(versionHandler "$result")
     execArgResponse "${SUCCESS_CODE}" "version" "${result}"
 }
 
@@ -90,6 +102,7 @@ getEngineUpdates(){
     }
 
     local result=$(execReturnAction "_getEngineUpdates" 'Checks for WordPress updates')
+    result=$(jsonHandler "$result")
     [ x${result} == x"" ] && { execArgJSONResponse "${SUCCESS_CODE}" "versionsToUpdate" "[]"; } || { execArgJSONResponse "${SUCCESS_CODE}" "versionsToUpdate"  "${result}"; }
 }
 
@@ -105,8 +118,10 @@ updateEngine(){
     }
 
     local oldVersion=$(execReturnAction "_getEngineVersion" 'Get  WordPress version')
+    oldVersion=$(versionHandler "$oldVersion")
     execAction "_updateEngine" "Update WordPress Core"
     local newVersion=$(execReturnAction "_getEngineVersion" 'Get  WordPress version')
+    newVersion=$(versionHandler "$newVersion")
     execUpdateResponse "${SUCCESS_CODE}" "${oldVersion}" "${newVersion}"
 }
 
@@ -117,6 +132,7 @@ getPlugins(){
     }
 
     local result=$(execReturnAction "_getPlugins" 'Get plugins list')
+    result=$(jsonHandler "$result")
     execArgJSONResponse "${SUCCESS_CODE}" "plugins" "${result}"
 }
 
@@ -128,6 +144,7 @@ getPluginInfo(){
     }
 
     local result=$(execReturnAction "_getPluginInfo" "Get plugin ${plugin_name} info")
+    result=$(echo "$result" | grep -oE '\{.*\}')
     execArgJSONResponse "${SUCCESS_CODE}" "pluginInfo" "${result}"
 }
 
@@ -143,8 +160,10 @@ updatePlugin(){
     }
 
     local oldVersion=$(execReturnAction "_getPluginVersion" "Get plugin ${plugin_name} version")
+    oldVersion=$(versionHandler "$oldVersion")
     execAction "_updatePlugin" "Update plugin ${plugin_name}"
     local newVersion=$(execReturnAction "_getPluginVersion" "Get plugin ${plugin_name} version")
+    newVersion=$(versionHandler "$newVersion")
     execUpdateResponse "${SUCCESS_CODE}" "${oldVersion}" "${newVersion}"
 }
 
@@ -161,6 +180,7 @@ activatePlugin(){
 
     execAction "_activatePlugin" "Activating ${plugin_name}"
     local result=$(execReturnAction "_getStatusPlugin" "Get ${plugin_name} status")
+    result=$(echo "$result" | awk '{print $NF}')
     execArgResponse "${SUCCESS_CODE}" "pluginStatus" "${result}"
 }
 
@@ -177,6 +197,7 @@ deactivatePlugin(){
 
     execAction "_deactivatePlugin" "Deactivating ${plugin_name}"
     local result=$(execReturnAction "_getStatusPlugin" "Get ${plugin_name} status")
+    result=$(echo "$result" | awk '{print $NF}')
     execArgResponse "${SUCCESS_CODE}" "pluginStatus" "${result}"
 }
 
