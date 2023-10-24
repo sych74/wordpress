@@ -11,7 +11,7 @@ description:
   text: WordPress Standalone with built-in kit for choosing optimal application servers and a set of advanced features for running websites and blogs. WordPress CMS deployed as a lightweight standalone container with minimal allocated resources for cost efficiency.
   short: WordPress Standalone with built-in kit for choosing optimal application servers and a set of advanced features for running websites and blogs
 
-baseUrl: https://raw.githubusercontent.com/jelastic-jps/wordpress/v2.2.0
+baseUrl: https://raw.githubusercontent.com/sych74/wordpress/JE-68478
 
 onBeforeInit: /scripts/beforeInit.js?_r=${fn.random}
 onBeforeInstall: /scripts/beforeInstall.js?_r=${fn.random}
@@ -187,14 +187,15 @@ actions:
         DOMAIN: ${response.domains} 
 
   installLEaddon:
-    - install: https://github.com/jelastic-jps/lets-encrypt/blob/master/manifest.jps?_r=${fn.random}
+    - install: https://github.com/jelastic-jps/lets-encrypt/blob/stage/manifest.jps?_r=${fn.random}
       nodeGroup: cp
       skipEmail: true
       settings:
         test: false
         skipEmail: true
         fallbackToX1: true
-        withExtIp: ${globals.isExtIP}
+        withExtIp: false
+        withIntSSL: true
 
   initLEsettings:
     - script: |
@@ -210,7 +211,8 @@ actions:
         echo "webroot=true" > /var/lib/jelastic/keys/letsencrypt/settings-custom;
         echo "webrootPath=/var/www/webroot/ROOT" >> /var/lib/jelastic/keys/letsencrypt/settings-custom;
         echo "test=false" >> /var/lib/jelastic/keys/letsencrypt/settings-custom;
-        echo "withExtIp=${globals.isExtIP}" >> /var/lib/jelastic/keys/letsencrypt/settings-custom;
+        echo "withExtIp=false" >> /var/lib/jelastic/keys/letsencrypt/settings-custom;
+        echo "withIntSSL=true" >> /var/lib/jelastic/keys/letsencrypt/settings-custom;
       user: root
 
   setupLEdomain:
