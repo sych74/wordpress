@@ -9,7 +9,7 @@ var resp = {
 if ('${settings.ls-addon:false}'== 'true') {
   resp.nodes.push({
     nodeType: "llsmp",
-    tag: "6.1.2-php-8.0.28",
+    tag: "6.1.2-php-8.0.29-almalinux-9",
     count: 1,
     cloudlets: "${settings.cloudlets:16}",
     diskLimit: "${settings.diskspace:[quota.disk.limitation]}",
