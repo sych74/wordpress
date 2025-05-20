@@ -9,8 +9,8 @@ categories:
 logo: /images/wp-standalone.png
 homepage: http://wordpress.org/
 description:
-  text: WordPress Standalone with built-in kit for choosing optimal application servers and a set of advanced features for running websites and blogs. WordPress CMS deployed as a lightweight standalone container with minimal allocated resources for cost efficiency.
-  short: WordPress Standalone with built-in kit for choosing optimal application servers and a set of advanced features for running websites and blogs
+  text: WordPress Standalone Master with built-in kit for choosing optimal application servers and a set of advanced features for running websites and blogs. WordPress CMS deployed as a lightweight standalone container with minimal allocated resources for cost efficiency.
+  short: WordPress Standalone Master with built-in kit for choosing optimal application servers and a set of advanced features for running websites and blogs
 
 baseUrl: https://cdn.jsdelivr.net/gh/sych74/wordpress@latest
 
