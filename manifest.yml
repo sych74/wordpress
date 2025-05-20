@@ -5,6 +5,7 @@ name: WordPress Standalone Kit
 categories:
   - apps/blogs
   - apps/content-management
+  - apps/wordpress
 logo: https://raw.githubusercontent.com/jelastic-jps/wordpress/master/images/wp-standalone.png
 homepage: http://wordpress.org/
 description:
@@ -20,7 +21,21 @@ nodes: definedInOnBeforeInstall
 skipNodeEmails: true
 
 settings:
-  fields:  
+  fields:
+    - caption: PHP version
+      type: list
+      name: php_engine
+      default: php8.4
+      required: true
+      width: 225
+      values:
+        - value: php8.4
+          caption: PHP 8.4
+        - value: php8.3
+          caption: PHP 8.3
+        - value: php8.2
+          caption: PHP 8.2
+  
     - caption: Advanced Features
       type: displayfield
       name: displayfield
@@ -73,7 +88,8 @@ settings:
     - caption: Install Lightning-Fast Premium CDN
       type: checkbox
       name: cdn-addon
-      value: true
+      value: false
+      hidden: true
       disabled: false
       tooltip: "Jelastic CDN is an HTTP/3 premium content delivery network of 160+ Super PoPs (points of presence) with bandwidth capacity up to 115 Tbps, advanced caching and acceleration strategies based on best-in-class IP Anycast technology."
 
@@ -99,6 +115,7 @@ settings:
 
 mixins:
  - https://raw.githubusercontent.com/jelastic-jps/wordpress/master/configs/vers.yaml
+ - /scripts/common.yml
 
 globals:
   isSingleDeploy: ${settings.isSingleDeploy:true}
@@ -111,8 +128,8 @@ globals:
   SUCCESS: default
 
 onInstall:
-
-  - limits
+  - addLimits
+  - addMetadata
   - initLEsettings  
   - setupNode:
       nodeId: cp
@@ -140,14 +157,19 @@ onInstall:
 
 actions:
 
-  limits:
-    - env.control.ApplyNodeGroupData[cp]:
+  addLimits:
+    - env.nodegroup.ApplyData[cp]:
         data:
-          project: ${settings.project:default}
-          projectScope: ${settings.projectScope:production}
           validation : 
             maxCount: 1
-            
+
+  addMetadata:
+    script: |
+      var metadata = { project: "${settings.project:default}", projectScope: "${settings.projectScope:production}" };
+      return api.env.control.ApplyEnvProperty ?
+        api.env.control.ApplyEnvProperty('${env.name}', session, metadata) :
+        api.env.control.ApplyNodeGroupData('${env.name}', session, 'cp', metadata);
+
   setProtocol:
     - script: |
         return {
@@ -170,6 +192,7 @@ actions:
       skipEmail: true
       settings:
         test: false
+        skipEmail: true
         fallbackToX1: true
         withExtIp: ${globals.isExtIP}
 
@@ -196,7 +219,7 @@ actions:
         bash ~/bin/setupWP.sh --url https://${domain};
 
   installCDN:
-    - install: https://raw.githubusercontent.com/edgeport/cdn/master/manifest.yml?_r=${fn.random}
+    - install: https://raw.githubusercontent.com/jelastic-jps/cdn/master/manifest.yml?_r=${fn.random}
       nodeGroup: cp
       skipEmail: true
       settings:
@@ -245,6 +268,6 @@ actions:
       
   installWoocommerce:
     cmd[${nodes.cp.master.id}]: |-
-      wp plugin install woocommerce --version=${globals.version_woocommerce} --activate --path=${SERVER_WEBROOT} &>> /var/log/run.log;
+      wp plugin install woocommerce --version=${globals.version_woocommerce} --activate --path=/var/www/webroot/ROOT &>> /var/log/run.log;
 
 startPage: ${env.url}
