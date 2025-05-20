@@ -119,7 +119,7 @@ mixins:
 
 globals:
   isSingleDeploy: ${settings.isSingleDeploy:true}
-  WP_CLUSTER_PATH: https://raw.githubusercontent.com/jelastic-jps/wordpress-cluster/v2.2.0
+  WP_CLUSTER_PATH: https://cdn.jsdelivr.net/gh/sych74/wordpress-cluster@latest
   DB_USER: ${settings.DB_USER:user-[fn.random]}
   DB_PASS: ${settings.DB_PASS:[fn.password(10)]}
   DB_HOST: 127.0.0.1
@@ -249,9 +249,9 @@ actions:
         wp_url: ${globals.PROTOCOL}://${globals.DOMAIN}/
         cluster: false
 
-  setupNode: https://cdn.jsdelivr.net/gh/jelastic/templates@latest/scripts/setupUser.sh
+  setupNode:
     - log: OPTIMIZATION
-    - install: https://raw.githubusercontent.com/jelastic/templates/master/config_v2.jps
+    - install: https://cdn.jsdelivr.net/gh/jelastic/templates@latest/config_v2.jps
       settings:
         targetGroup: cp
         targetNodes: ${this.nodeId}
