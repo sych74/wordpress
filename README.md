@@ -13,7 +13,7 @@ This package creates a dedicated WordPress environment with a set of built-in ad
 
 - a PHP-based application server (either LiteSpeed or NGINX)
 - a MariaDB database server
-- a Redis high-performance RAM-allocated data structure store
+- a Memcached server as a high-speed caching solution
 - additional features can be enabled via the advanced settings
 
 ![WordPress standalone topology](images/01-wp-standalone-topology.png)
