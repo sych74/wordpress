@@ -16,7 +16,7 @@ This package creates a dedicated WordPress environment with a set of built-in ad
 - a Memcached server as a high-speed caching solution
 - additional features can be enabled via the advanced settings
 
-![WordPress standalone topology](images/01-wp-standalone-topology.png)
+![WordPress standalone topology](images/01-wp-standalone-topology-memcached.png)
 
 
 ## Deployment to Cloud
