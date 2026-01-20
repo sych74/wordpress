@@ -9,7 +9,7 @@ var resp = {
 if ('${settings.ls-addon:false}'== 'true') {
   resp.nodes.push({
     nodeType: "llsmp",
-    engine: "${settings.php_engine:php8.3}",
+    engine: "${settings.php_engine:php8.5}",
     count: 1,
     cloudlets: "${settings.cloudlets:16}",
     diskLimit: "${settings.diskspace:[quota.disk.limitation]}",
@@ -18,7 +18,7 @@ if ('${settings.ls-addon:false}'== 'true') {
     displayName: "AppServer",
     env: {
       SERVER_WEBROOT: "/var/www/webroot/ROOT",
-      REDIS_ENABLED: "true",
+      CACHE_ENABLED: "true",
       WAF: "${settings.waf}",
       WP_PROTECT: wpbfp,
       WP_PROTECT_LIMIT: 100
@@ -27,7 +27,7 @@ if ('${settings.ls-addon:false}'== 'true') {
 } else {
   resp.nodes.push({
     nodeType: "lemp",
-    engine: "${settings.php_engine:php8.3}",
+    engine: "${settings.php_engine:php8.5}",
     count: 1,
     cloudlets: "${settings.cloudlets:16}",
     diskLimit: "${settings.diskspace:[quota.disk.limitation]}",
@@ -36,7 +36,7 @@ if ('${settings.ls-addon:false}'== 'true') {
     displayName: "AppServer",
     env: {
       SERVER_WEBROOT: "/var/www/webroot/ROOT",
-      REDIS_ENABLED: "true"
+      CACHE_ENABLED: "true"
     }
   })
 }

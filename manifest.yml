@@ -36,10 +36,12 @@ settings:
     - caption: PHP version
       type: list
       name: php_engine
-      default: php8.4
+      default: php8.5
       required: true
       width: 225
       values:
+        - value: php8.5
+          caption: PHP 8.5
         - value: php8.4
           caption: PHP 8.4
         - value: php8.3
@@ -243,8 +245,8 @@ actions:
         db_host: ${globals.DB_HOST}
         db_user: ${globals.DB_USER}
         db_pass: ${globals.DB_PASS}
-        redis_host: /var/run/redis/redis.sock
-        redis_port: 0
+        cache_host: /var/run/memcached/memcached.sock
+        cache_port: 0
         wp_admin_pass: ${globals.WP_ADMIN_PASS}
         wp_title: "Hello World"
         wp_url: ${globals.PROTOCOL}://${globals.DOMAIN}/
